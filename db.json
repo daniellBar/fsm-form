@@ -1,0 +1,54 @@
+{
+  "user": [
+    {
+      "name": "Daniel Bar",
+      "email": "d.bar6531@gmail.com",
+      "hobbies": [
+        "golf",
+        "weight_lifting",
+        "fishing",
+        "netflix"
+      ],
+      "id": 1
+    },
+    {
+      "name": "Daniel Bar",
+      "email": "d.bar6531@gmail.com",
+      "hobbies": [
+        "golf"
+      ],
+      "id": 2
+    },
+    {
+      "name": "Daniel Bar",
+      "email": "d.bar6531@gmail.com",
+      "hobbies": [],
+      "id": 3
+    },
+    {
+      "id": 4
+    },
+    {
+      "name": "Daniel Bar",
+      "email": "d.bar6531@gmail.com",
+      "hobbies": [
+        "golf"
+      ],
+      "id": 5
+    },
+    {
+      "name": "Daniel Bar",
+      "email": "d.bar6531@gmail.com",
+      "hobbies": [],
+      "id": 6
+    },
+    {
+      "name": "Daniel Bar",
+      "email": "d.bar6531@gmail.com",
+      "hobbies": [
+        "weight_lifting"
+      ],
+      "id": 7
+    }
+  ]
+}
