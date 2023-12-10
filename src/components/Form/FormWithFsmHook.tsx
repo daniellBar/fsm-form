@@ -1,19 +1,25 @@
 // External imports
-import { FC, useCallback, useEffect, useState } from 'react';
-import { Formik, FormikErrors, Form as FormikForm, FormikHelpers, FormikState } from 'formik';
+import { FC, useCallback, useEffect, useState } from "react";
+import {
+  Formik,
+  FormikErrors,
+  Form as FormikForm,
+  FormikHelpers,
+  FormikState,
+} from "formik";
 
 // Internal imports
-import { FormContainer } from './styles';
-import { initialValues, stepComponents, validationSchema } from './consts';
-import { EFormStep, FormValues } from './types';
-import { User } from '../../pages/MainPage/MainPage.api';
-import { NotificationPopup } from '../UI/NotificationPopup/NotificationPopup';
-import { PopupContent } from './components/PopupContent/PopupContent';
+import { FormContainer } from "./styles";
+import { initialValues, stepComponents, validationSchema } from "./consts";
+import { EFormStep, FormValues } from "./types";
+import { User, createUser } from "../../pages/MainPage/MainPage.api";
+import { NotificationPopup } from "../UI/NotificationPopup/NotificationPopup";
+import { PopupContent } from "./components/PopupContent/PopupContent";
 
 // FSM related Internal imports
-import { EventOption, StateOption, definition } from './formFsmMachine';
-import { useFSM } from '../../fsm/useFsm';
-import { hasEmptyValues } from '../../utils';
+import { EventOption, StateOption, definition } from "./formFsmMachine";
+import { useFSM } from "../../fsm/useFsm";
+import { hasEmptyValues } from "../../utils";
 
 export const FormWithFsmHook: FC = () => {
   const [activeStep, setActiveStep] = useState(EFormStep.InfoStep);
@@ -26,26 +32,31 @@ export const FormWithFsmHook: FC = () => {
   >(definition);
 
   useEffect(() => {
-    if (currentState === 'InfoStep' && activeStep !== EFormStep.InfoStep) {
+    if (currentState === "InfoStep" && activeStep !== EFormStep.InfoStep) {
       // this is a a case when user filled the info step and then proceeded to hobbies step
       // and instead of finishing the form he went back to info step
       setActiveStep(EFormStep.InfoStep);
     }
-    if (currentState === 'Error') {
+    if (currentState === "Error") {
+      // do what you would like with the errors.
+      // for now it just console.log
       console.log(errors);
-    } else if (currentState === 'HobbiesStep') {
+    } else if (currentState === "HobbiesStep") {
       setActiveStep(EFormStep.HobbiesStep);
-    } else if (currentState === 'SubmitStep') {
+    } else if (currentState === "SubmittedStep") {
       setOpenPopup(true);
-    } else if (currentState === 'FinishFlowStep') {
-      setCurrentState('InfoStep'); // rest the fsm
+    } else if (currentState === "FinishFlowStep") {
+      setCurrentState("InfoStep"); // rest the fsm
       setActiveStep(EFormStep.InfoStep); // rest the form step
       setOpenPopup(false);
     }
-  }, [currentState, errors]);
+  }, [currentState, errors,activeStep,setActiveStep,setCurrentState]);
 
-  const handleSubmitInfoStep = async (values: FormValues, actions: FormikHelpers<FormValues>) => {
-    await transition('Proceed');
+  const handleSubmitInfoStep = async (
+    values: FormValues,
+    actions: FormikHelpers<FormValues>
+  ) => {
+    await transition("Proceed");
     actions.setTouched({});
     actions.setSubmitting(false);
   };
@@ -54,14 +65,17 @@ export const FormWithFsmHook: FC = () => {
     values: FormValues,
     actions: FormikHelpers<FormValues>
   ) => {
-    const { name, email, hobbies } = values;
-    const user: User = {
-      name,
-      email,
-      hobbies: hobbies.map(({ value }) => value)
-    };
     try {
-      await transition('Proceed', user);
+      const { name, email, hobbies } = values;
+      const user: User = {
+        name,
+        email,
+        hobbies: hobbies.map(({ value }) => value),
+      };
+      const { data: result } = await createUser(user);
+      if (result) {
+        await transition("Proceed");
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -82,22 +96,25 @@ export const FormWithFsmHook: FC = () => {
     [activeStep]
   );
 
-  const checkStepValidity = (values: FormValues, errors: FormikErrors<FormValues>) => {
+  const checkStepValidity = (
+    values: FormValues,
+    errors: FormikErrors<FormValues>
+  ) => {
     const hasErrors = Object.keys(errors).length;
     const hasEmptyFields = hasEmptyValues(values);
     return !hasErrors && !hasEmptyFields;
   };
 
   const handleExpended = async (step: EFormStep) => {
-    if (currentState === 'HobbiesStep') {
-      await transition('Collapse');
+    if (currentState === "HobbiesStep") {
+      await transition("Collapse");
     }
   };
 
   const onClosePopup = async (
     resetForm: (nextState?: Partial<FormikState<FormValues>>) => void
   ) => {
-    await transition('Proceed');
+    await transition("Proceed");
     resetForm({}); // reset form values to be empty
   };
 
@@ -109,9 +126,12 @@ export const FormWithFsmHook: FC = () => {
           validationSchema={validationSchema[activeStep]}
           onSubmit={(values, actions) => {
             submitByStep(values, actions);
-          }}>
+          }}
+        >
           {({ isSubmitting, values, errors, setFieldValue, resetForm }) => (
-            <FormikForm style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+            <FormikForm
+              style={{ display: "flex", flexDirection: "column", gap: "30px" }}
+            >
               {stepComponents.map(({ component }, idx) => {
                 const StepComponent = component;
                 return (

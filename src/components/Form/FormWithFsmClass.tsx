@@ -5,7 +5,7 @@ import { Formik, Form as FormikForm, FormikHelpers, FormikState } from 'formik';
 // Internal imports
 import { initialValues, stepComponents, validationSchema } from './consts';
 import { EFormStep, FormValues } from './types';
-import { User } from '../../pages/MainPage/MainPage.api';
+import { User, createUser } from '../../pages/MainPage/MainPage.api';
 import { NotificationPopup } from '../UI/NotificationPopup/NotificationPopup';
 import { PopupContent } from './components/PopupContent/PopupContent';
 import { FormContainer } from './styles';
@@ -38,19 +38,22 @@ export const FormWithFsmClass: FC = () => {
     values: FormValues,
     actions: FormikHelpers<FormValues>
   ) => {
-    const { name, email, hobbies } = values;
-    const user: User = {
-      name,
-      email,
-      hobbies: hobbies.map(({ value }) => value)
-    };
     try {
-      await FormStateMachine.transition('Proceed', user);
+      const { name, email, hobbies } = values;
+      const user: User = {
+        name,
+        email,
+        hobbies: hobbies.map(({ value }) => value)
+      };
+      const { data: result } = await createUser(user);
+      if (result) {
+      await  FormStateMachine.transition("Proceed");
+      }
       const currentState = FormStateMachine.getCurrentState();
       if (currentState === 'Error') {
         console.log(FormStateMachine.getErrors());
       }
-      if (currentState === 'SubmitStep') {
+      if (currentState === 'SubmittedStep') {
         setOpenPopup(true);
       }
     } catch (error) {

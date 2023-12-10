@@ -1,12 +1,20 @@
 // External imports
-import { FC } from 'react';
-import { Box, FormControl, Checkbox as MuiCheckbox, SxProps } from '@mui/material';
-import { CheckboxProps as MuiCheckboxProps, FormHelperText } from '@mui/material';
-import { Field } from 'formik';
+import { FC } from "react";
+import {
+  Box,
+  FormControl,
+  Checkbox as MuiCheckbox,
+  SxProps,
+} from "@mui/material";
+import {
+  CheckboxProps as MuiCheckboxProps,
+  FormHelperText,
+} from "@mui/material";
+import { Field } from "formik";
 
 // Internal imports
-import { checkBoxStyles } from './styles';
-import { helperTextStyles } from '../../../globalStyles';
+import { checkBoxStyles } from "./styles";
+import { helperTextStyles } from "../../../globalStyles";
 
 export interface CheckboxProps extends MuiCheckboxProps {
   showError?: boolean;
@@ -20,7 +28,7 @@ const BaseCheckbox: FC<CheckboxProps> = ({
   showError = false,
   errorMessage,
   containerSx,
-sx,
+  sx,
   ...props
 }) => {
   return (
@@ -30,7 +38,11 @@ sx,
           checked={checked}
           data-testid="checkbox"
           disabled={disabled}
-          sx={{ ...checkBoxStyles, color: errorMessage && showError ? 'error.main' : 'default', ...sx }}
+          sx={{
+            ...checkBoxStyles,
+            color: errorMessage && showError ? "error.main" : "default",
+            ...sx,
+          }}
           {...props}
         />
         {errorMessage && showError && (
